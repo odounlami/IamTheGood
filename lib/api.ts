@@ -99,8 +99,20 @@ export function updateMyProfile(payload: {
   name?: string
   whatsapp?: string
   bio?: string
+  email?: string
+  currentPassword?: string
 }) {
   return internalRequest<ApiProfile>("/api/profile", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  })
+}
+
+export function changePassword(payload: {
+  currentPassword: string
+  newPassword: string
+}) {
+  return internalRequest<{ message: string }>("/api/auth/password", {
     method: "PATCH",
     body: JSON.stringify(payload),
   })
