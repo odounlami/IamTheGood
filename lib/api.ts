@@ -53,25 +53,6 @@ export function clearAuth() {
   void fetch("/api/auth/logout", { method: "POST" })
 }
 
-async function publicRequest<T>(path: string, options: RequestInit = {}) {
-  const headers = new Headers(options.headers)
-  headers.set("Content-Type", "application/json")
-
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  })
-
-  const data = await response.json().catch(() => null)
-
-  if (!response.ok) {
-    const message = Array.isArray(data?.message) ? data.message[0] : data?.message
-    throw new Error(message || "Une erreur est survenue.")
-  }
-
-  return data as T
-}
-
 async function internalRequest<T>(path: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers)
   headers.set("Content-Type", "application/json")
@@ -113,7 +94,7 @@ export function login(payload: { email: string; password: string }) {
 }
 
 export function getProfile(slug: string) {
-  return publicRequest<ApiProfile>(`/users/${encodeURIComponent(slug)}`)
+  return internalRequest<ApiProfile>(`/api/profile/${encodeURIComponent(slug)}`)
 }
 
 export function updateMyProfile(payload: {
