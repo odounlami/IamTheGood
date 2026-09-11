@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { ProfileReceipt } from "@/components/profile-receipt"
 import { LedgerReview } from "@/components/ledger-review"
-import { getAverageRating, getProfileBySlug } from "@/lib/mock-data"
-import type { ApiProfile } from "@/lib/api"
+import { getDemoApiProfile } from "@/lib/mock-data"
 
 const steps = [
   { n: "1", title: "Créez votre profil", text: "Votre nom, une courte présentation, votre numéro WhatsApp. Deux minutes, aucune carte bancaire." },
@@ -15,21 +14,7 @@ const steps = [
 ]
 
 export default function Page() {
-  const source = getProfileBySlug("awa-ndiaye")!
-  const example: ApiProfile = {
-    id: "demo-profile",
-    name: source.name,
-    bio: source.bio,
-    whatsapp: source.whatsapp ?? null,
-    slug: source.slug,
-    createdAt: source.createdAt,
-    averageRating: getAverageRating(source),
-    reviewCount: source.reviews.length,
-    reviews: source.reviews.map((review) => ({
-      ...review,
-      comment: review.comment ?? null,
-    })),
-  }
+  const example = getDemoApiProfile("awa-akakpo")!
   return (
     <div className="flex min-h-svh flex-col"><SiteHeader /><main className="flex-1">
       <section className="mx-auto grid max-w-5xl gap-12 px-6 py-16 md:grid-cols-2 md:items-center md:py-24"><div className="flex flex-col gap-6"><span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Pour les vendeurs Facebook &amp; WhatsApp Marketplace</span><h1 className="text-balance font-serif text-4xl font-bold leading-[1.1] text-foreground md:text-5xl">La confiance qui se construit, avis après avis.</h1><p className="text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">Sur Marketplace, personne ne sait qui vous êtes avant le premier message. Créez un profil de réputation public, partagez votre lien dans vos annonces, et laissez vos acheteurs témoigner de votre sérieux avec un vrai cachet de confiance.</p><div className="flex flex-wrap items-center gap-3"><Button render={<Link href="/signup" />} nativeButton={false} size="lg">Créer mon profil gratuitement <ArrowRight data-icon="inline-end" /></Button><Button render={<Link href={`/u/${example.slug}`} />} nativeButton={false} variant="outline" size="lg">Voir un exemple de profil</Button></div></div><ProfileReceipt profile={example} /></section>
