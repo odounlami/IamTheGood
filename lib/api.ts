@@ -7,7 +7,6 @@ export type AuthUser = {
 }
 
 export type AuthResponse = {
-  accessToken: string
   user: AuthUser
 }
 
@@ -30,8 +29,7 @@ export type ApiProfile = {
 }
 
 export function getAccessToken() {
-  if (typeof window === "undefined") return null
-  return localStorage.getItem("iamthegood_token")
+  return null
 }
 
 export function getStoredUser(): AuthUser | null {
@@ -47,22 +45,38 @@ export function getStoredUser(): AuthUser | null {
 }
 
 export function setAuth(response: AuthResponse) {
-  localStorage.setItem("iamthegood_token", response.accessToken)
   localStorage.setItem("iamthegood_user", JSON.stringify(response.user))
 }
 
 export function clearAuth() {
-  localStorage.removeItem("iamthegood_token")
   localStorage.removeItem("iamthegood_user")
+  void fetch("/api/auth/logout", { method: "POST" })
 }
 
-async function request<T>(path: string, options: RequestInit = {}) {
-  const token = getAccessToken()
+async function publicRequest<T>(path: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers)
   headers.set("Content-Type", "application/json")
-  if (token) headers.set("Authorization", `Bearer ${token}`)
 
   const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers,
+  })
+
+  const data = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    const message = Array.isArray(data?.message) ? data.message[0] : data?.message
+    throw new Error(message || "Une erreur est survenue.")
+  }
+
+  return data as T
+}
+
+async function internalRequest<T>(path: string, options: RequestInit = {}) {
+  const headers = new Headers(options.headers)
+  headers.set("Content-Type", "application/json")
+
+  const response = await fetch(path, {
     ...options,
     headers,
   })
@@ -85,21 +99,21 @@ export function signup(payload: {
   password: string
   confirmPassword: string
 }) {
-  return request<AuthResponse>("/auth/signup", {
+  return internalRequest<AuthResponse>("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify(payload),
   })
 }
 
 export function login(payload: { email: string; password: string }) {
-  return request<AuthResponse>("/auth/login", {
+  return internalRequest<AuthResponse>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
   })
 }
 
 export function getProfile(slug: string) {
-  return request<ApiProfile>(`/users/${encodeURIComponent(slug)}`)
+  return publicRequest<ApiProfile>(`/users/${encodeURIComponent(slug)}`)
 }
 
 export function updateMyProfile(payload: {
@@ -107,7 +121,7 @@ export function updateMyProfile(payload: {
   whatsapp?: string
   bio?: string
 }) {
-  return request<ApiProfile>("/users/me", {
+  return internalRequest<ApiProfile>("/api/profile", {
     method: "PATCH",
     body: JSON.stringify(payload),
   })
@@ -118,7 +132,7 @@ export function createReview(payload: {
   rating: number
   comment?: string
 }) {
-  return request("/reviews", {
+  return internalRequest("/api/reviews", {
     method: "POST",
     body: JSON.stringify(payload),
   })
