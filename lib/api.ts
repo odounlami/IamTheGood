@@ -83,6 +83,7 @@ export function signup(payload: {
   bio: string
   email: string
   password: string
+  confirmPassword: string
 }) {
   return request<AuthResponse>("/auth/signup", {
     method: "POST",
