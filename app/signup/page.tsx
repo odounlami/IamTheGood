@@ -22,13 +22,23 @@ export default function SignupPage() {
     setError("")
 
     const form = new FormData(event.currentTarget)
+    const password = String(form.get("password") ?? "")
+    const confirmPassword = String(form.get("confirmPassword") ?? "")
+
+    if (password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.")
+      setSubmitting(false)
+      return
+    }
+
     try {
       const response = await signup({
         name: String(form.get("name") ?? "").trim(),
         whatsapp: String(form.get("whatsapp") ?? "").trim(),
         bio: String(form.get("bio") ?? "").trim(),
         email: String(form.get("email") ?? "").trim(),
-        password: String(form.get("password") ?? ""),
+        password,
+        confirmPassword,
       })
       setAuth(response)
       router.push("/dashboard")
@@ -54,6 +64,7 @@ export default function SignupPage() {
               <Field><FieldLabel htmlFor="bio">Présentation courte</FieldLabel><Textarea id="bio" name="bio" rows={3} placeholder="Ce que vous vendez et où vous êtes basé…" required /><FieldDescription>Visible sur votre profil public.</FieldDescription></Field>
               <Field><FieldLabel htmlFor="email">E-mail</FieldLabel><Input id="email" name="email" type="email" placeholder="vous@exemple.com" required /></Field>
               <Field><FieldLabel htmlFor="password">Mot de passe</FieldLabel><Input id="password" name="password" type="password" required minLength={8} /></Field>
+              <Field><FieldLabel htmlFor="confirmPassword">Confirmer le mot de passe</FieldLabel><Input id="confirmPassword" name="confirmPassword" type="password" required minLength={8} /></Field>
             </FieldGroup>
             {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
             <Button type="submit" className="mt-6 w-full" disabled={submitting}>{submitting ? "Création du profil…" : "Créer mon profil"}</Button>
