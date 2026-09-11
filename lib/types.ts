@@ -2,7 +2,7 @@ export interface Review {
   id: string
   authorName: string
   rating: number
-  comment?: string
+  comment?: string | null
   date: string
 }
 
