@@ -1,9 +1,11 @@
 import type { ApiProfile } from "@/lib/api"
 import type { Profile } from "@/lib/types"
 
+type DemoProfile = Profile & { id: string }
+
 export const CURRENT_USER_SLUG = "awa-akakpo"
 
-export const PROFILES: (Profile & { id: string })[] = [
+export const PROFILES: DemoProfile[] = [
   {
     id: "demo-awa-akakpo",
     slug: "awa-akakpo",
@@ -45,7 +47,7 @@ export const PROFILES: (Profile & { id: string })[] = [
   },
 ]
 
-export function getProfileBySlug(slug: string): Profile | undefined { return PROFILES.find((profile) => profile.slug === slug) }
+export function getProfileBySlug(slug: string): DemoProfile | undefined { return PROFILES.find((profile) => profile.slug === slug) }
 export function getAverageRating(profile: Profile): number {
   if (profile.reviews.length === 0) return 0
   return profile.reviews.reduce((sum, review) => sum + review.rating, 0) / profile.reviews.length
