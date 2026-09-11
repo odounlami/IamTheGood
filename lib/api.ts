@@ -1,5 +1,3 @@
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "https://imthegoodback.onrender.com").replace(/\/$/, "")
-
 export type AuthUser = {
   id: string
   email: string
