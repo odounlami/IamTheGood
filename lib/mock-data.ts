@@ -1,13 +1,13 @@
+import type { ApiProfile } from "@/lib/api"
 import type { Profile } from "@/lib/types"
 
-// Slug of the profile the demo treats as "the logged-in seller".
-// Swap this for a real session lookup once the API is wired in.
-export const CURRENT_USER_SLUG = "awa-ndiaye"
+export const CURRENT_USER_SLUG = "awa-akakpo"
 
-export const PROFILES: Profile[] = [
+export const PROFILES: (Profile & { id: string })[] = [
   {
-    slug: "awa-ndiaye",
-    name: "Awa Aïssi",
+    id: "demo-awa-akakpo",
+    slug: "awa-akakpo",
+    name: "Awa Akakpo",
     bio: "Je vends des vêtements pour bébé en très bon état, lot ou à l'unité. Livraison possible sur Cotonou.",
     whatsapp: "+229 97 45 12 89",
     createdAt: "2024-11-03",
@@ -19,19 +19,21 @@ export const PROFILES: Profile[] = [
     ],
   },
   {
-    slug: "ibrahima-toure",
-    name: "Ibrahim Touré",
+    id: "demo-ibrahim-adjovi",
+    slug: "ibrahim-adjovi",
+    name: "Ibrahim Adjovi",
     bio: "Revente de téléphones reconditionnés, testés devant vous avant paiement. Basé à Akpakpa.",
     whatsapp: "+229 98 02 34 17",
     createdAt: "2025-01-18",
     reviews: [
       { id: "r5", authorName: "Aïcha Hounkpe", rating: 5, comment: "Téléphone testé sur place comme promis, batterie au top. Je recommande.", date: "2025-08-02" },
       { id: "r6", authorName: "Omar Agossou", rating: 4, comment: "Correct, prix un peu élevé mais le produit est conforme à l'annonce.", date: "2025-06-11" },
-      { id: "r7", authorName: "Ndeye Kora", rating: 5, comment: "Très pédagogue, il m'a montré comment vérifier l'IMEI avant d'acheter.", date: "2025-04-27" },
+      { id: "r7", authorName: "Nadège Kora", rating: 5, comment: "Très pédagogue, il m'a montré comment vérifier l'IMEI avant d'acheter.", date: "2025-04-27" },
     ],
   },
   {
-    slug: "khadija-sow",
+    id: "demo-khadija-soglo",
+    slug: "khadija-soglo",
     name: "Khadija Soglo",
     bio: "Pâtisserie maison sur commande — gâteaux d'anniversaire, cupcakes, desserts. Cotonou et environs.",
     whatsapp: "+229 96 14 90 55",
@@ -51,4 +53,26 @@ export function getAverageRating(profile: Profile): number {
 export function formatRating(rating: number): string { return rating.toFixed(1).replace(".", ",") }
 export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso))
+}
+
+export function getDemoApiProfile(slug: string): ApiProfile | undefined {
+  const profile = getProfileBySlug(slug)
+  if (!profile) return undefined
+  return {
+    id: profile.id,
+    name: profile.name,
+    bio: profile.bio,
+    whatsapp: profile.whatsapp ?? null,
+    slug: profile.slug,
+    createdAt: profile.createdAt,
+    averageRating: getAverageRating(profile),
+    reviewCount: profile.reviews.length,
+    reviews: profile.reviews.map((review) => ({
+      id: review.id,
+      authorName: review.authorName,
+      rating: review.rating,
+      comment: review.comment ?? null,
+      date: review.date,
+    })),
+  }
 }
