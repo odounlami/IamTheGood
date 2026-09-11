@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import { MessageCircle } from "lucide-react"
 
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { ProfileReceipt } from "@/components/profile-receipt"
 import { LedgerReview } from "@/components/ledger-review"
-import { ReviewForm } from "@/components/review-form"
+import { OwnProfileReviewSection } from "@/components/own-profile-review-section"
 import { getProfile } from "@/lib/api"
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -27,13 +26,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <SiteHeader variant="minimal" />
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10 md:py-14">
         <ProfileReceipt profile={profile} action={waNumber ? <Button render={<a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" />} nativeButton={false}><MessageCircle data-icon="inline-start" />Contacter sur WhatsApp</Button> : undefined} />
-
-        <section className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
-          <h2 className="mb-1 font-serif text-lg font-semibold text-foreground">Laisser un avis</h2>
-          <p className="mb-5 text-sm text-muted-foreground">Vous avez acheté ou vendu auprès de {profile.name} ? Partagez votre expérience.</p>
-          <ReviewForm sellerName={profile.name} targetId={profile.id} />
-        </section>
-
+        <OwnProfileReviewSection profile={{ id: profile.id, name: profile.name, slug: profile.slug }} />
         <section className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
           <h2 className="mb-2 font-serif text-lg font-semibold text-foreground">Registre des avis</h2>
           <p className="mb-4 text-sm text-muted-foreground">{profile.reviewCount} avis publiés au sujet de {profile.name}.</p>
