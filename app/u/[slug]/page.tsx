@@ -6,14 +6,14 @@ import { SiteHeader } from "@/components/site-header"
 import { ProfileReceipt } from "@/components/profile-receipt"
 import { LedgerReview } from "@/components/ledger-review"
 import { OwnProfileReviewSection } from "@/components/own-profile-review-section"
-import { getProfile } from "@/lib/api"
+import { getServerProfile } from "@/lib/api"
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   let profile
 
   try {
-    profile = await getProfile(slug)
+    profile = await getServerProfile(slug)
   } catch {
     notFound()
   }
