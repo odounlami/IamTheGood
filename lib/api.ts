@@ -91,6 +91,12 @@ export async function getServerProfile(slug: string) {
   return data as ApiProfile
 }
 
+export async function getMyReview(targetId: string) {
+  return internalRequest<{ review: { id: string; rating: number; comment: string | null; createdAt: string } | null }>(
+    `/api/reviews/mine/${encodeURIComponent(targetId)}`,
+  )
+}
+
 export function signup(payload: {
   name: string
   whatsapp: string
