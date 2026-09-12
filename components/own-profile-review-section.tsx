@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button"
 import { ReviewForm } from "@/components/review-form"
 import { getStoredUser } from "@/lib/api"
 
-export function OwnProfileReviewSection({ profile }: { profile: { id: string; name: string; slug: string } }) {
+export function OwnProfileReviewSection({ profile, hasReview }: { profile: { id: string; name: string; slug: string }; hasReview: boolean }) {
   const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
-    setIsOwnProfile(getStoredUser()?.slug === profile.slug)
+    const user = getStoredUser()
+    setIsOwnProfile(user?.slug === profile.slug)
+    setIsLoggedIn(!!user)
   }, [profile.slug])
 
   return (
@@ -19,9 +22,13 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
         <>
           <h2 className="mb-2 font-serif text-lg font-semibold text-foreground">Mon profil</h2>
           <p className="mb-4 text-sm text-muted-foreground">Vous consultez votre propre profil.</p>
-          <Button render={<Link href="/dashboard" />} nativeButton={false} variant="link" className="h-auto px-0">
-            Modifier mon profil
-          </Button>
+          <Button render={<Link href="/dashboard" />} nativeButton={false} variant="link" className="h-auto px-0">Modifier mon profil</Button>
+        </>
+      ) : hasReview && isLoggedIn ? (
+        <>
+          <h2 className="mb-1 font-serif text-lg font-semibold text-foreground">Vous avez déjà laissé un avis</h2>
+          <p className="mb-3 text-sm text-muted-foreground">Vous pouvez modifier votre avis depuis la section « Votre avis ».</p>
+          <Button render={<a href="#my-review" />} nativeButton={false} variant="link" className="h-auto px-0">Voir mon avis</Button>
         </>
       ) : (
         <>
