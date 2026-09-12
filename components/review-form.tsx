@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RatingStampInput } from "@/components/rating-stamp-input"
 import { createReview, getStoredUser } from "@/lib/api"
 
-export function ReviewForm({ sellerName, targetId }: { sellerName: string; targetId: string }) {
+export function ReviewForm({ sellerName, targetId, profileSlug }: { sellerName: string; targetId: string; profileSlug: string }) {
   const router = useRouter()
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState("")
@@ -34,12 +34,21 @@ export function ReviewForm({ sellerName, targetId }: { sellerName: string; targe
   }
 
   if (!getStoredUser()) {
+    const returnTo = `/u/${encodeURIComponent(profileSlug)}#review`
+    const loginHref = `/login?returnTo=${encodeURIComponent(returnTo)}`
+    const signupHref = `/signup?returnTo=${encodeURIComponent(returnTo)}`
+
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-muted-foreground">Connectez-vous pour laisser un avis.</p>
-        <Button render={<a href="/login" />} nativeButton={false} variant="outline">
-          Se connecter
-        </Button>
+        <p className="text-sm text-muted-foreground">Connectez-vous ou créez votre compte pour laisser un avis.</p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button render={<a href={loginHref} />} nativeButton={false} variant="outline">
+            Se connecter
+          </Button>
+          <Button render={<a href={signupHref} />} nativeButton={false}>
+            Créer mon compte
+          </Button>
+        </div>
       </div>
     )
   }
