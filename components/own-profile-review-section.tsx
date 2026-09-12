@@ -14,7 +14,7 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
   }, [profile.slug])
 
   return (
-    <section id="review" className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
+    <section className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
       {isOwnProfile ? (
         <>
           <h2 className="mb-2 font-serif text-lg font-semibold text-foreground">Mon profil</h2>
@@ -27,7 +27,7 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
         <>
           <h2 className="mb-1 font-serif text-lg font-semibold text-foreground">Laisser un avis</h2>
           <p className="mb-5 text-sm text-muted-foreground">Vous avez acheté ou vendu auprès de {profile.name} ? Partagez votre expérience.</p>
-          <ReviewForm sellerName={profile.name} targetId={profile.id} profileSlug={profile.slug} />
+          <ReviewForm sellerName={profile.name} targetId={profile.id} />
         </>
       )}
     </section>
