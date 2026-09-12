@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button"
 import { ReviewForm } from "@/components/review-form"
 import { getStoredUser } from "@/lib/api"
 
-export function OwnProfileReviewSection({ profile, hasReview }: { profile: { id: string; name: string; slug: string }; hasReview: boolean }) {
+export function OwnProfileReviewSection({ profile, reviewAuthorIds }: { profile: { id: string; name: string; slug: string }; reviewAuthorIds: string[] }) {
   const [isOwnProfile, setIsOwnProfile] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [hasReview, setHasReview] = useState(false)
 
   useEffect(() => {
     const user = getStoredUser()
     setIsOwnProfile(user?.slug === profile.slug)
     setIsLoggedIn(!!user)
-  }, [profile.slug])
+    setHasReview(!!user && reviewAuthorIds.includes(user.id))
+  }, [profile.slug, reviewAuthorIds])
 
   return (
     <section id="review" className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
