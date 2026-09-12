@@ -6,17 +6,48 @@ import { Button } from "@/components/ui/button"
 import { ReviewForm } from "@/components/review-form"
 import { getStoredUser } from "@/lib/api"
 
-export function OwnProfileReviewSection({ profile, reviewAuthorIds }: { profile: { id: string; name: string; slug: string }; reviewAuthorIds: string[] }) {
+export function OwnProfileReviewSection({ profile }: { profile: { id: string; name: string; slug: string } }) {
   const [ready, setReady] = useState(false)
   const [isOwnProfile, setIsOwnProfile] = useState(false)
   const [hasReview, setHasReview] = useState(false)
 
   useEffect(() => {
-    const user = getStoredUser()
-    setIsOwnProfile(user?.slug === profile.slug)
-    setHasReview(!!user && reviewAuthorIds.includes(user.id))
-    setReady(true)
-  }, [profile.slug, reviewAuthorIds])
+    let cancelled = false
+
+    async function checkReview() {
+      const user = getStoredUser()
+      if (!user) {
+        if (!cancelled) {
+          setIsOwnProfile(false)
+          setHasReview(false)
+          setReady(true)
+        }
+        return
+      }
+
+      if (user.slug === profile.slug) {
+        if (!cancelled) {
+          setIsOwnProfile(true)
+          setHasReview(false)
+          setReady(true)
+        }
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/reviews?targetId=${encodeURIComponent(profile.id)}`, { cache: "no-store" })
+        const data = await response.json().catch(() => null)
+        if (!cancelled) setHasReview(response.ok && !!data?.review)
+      } catch {
+        if (!cancelled) setHasReview(false)
+      } finally {
+        if (!cancelled) setReady(true)
+      }
+    }
+
+    checkReview()
+    return () => { cancelled = true }
+  }, [profile.id, profile.slug])
 
   return (
     <section id="review" className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
