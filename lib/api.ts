@@ -19,6 +19,7 @@ export type ApiProfile = {
   reviewCount: number
   reviews: {
     id: string
+    authorId?: string
     authorName: string
     rating: number
     comment: string | null
@@ -146,5 +147,16 @@ export function createReview(payload: {
   return internalRequest("/api/reviews", {
     method: "POST",
     body: JSON.stringify(payload),
+  })
+}
+
+export function updateReview(payload: {
+  id: string
+  rating: number
+  comment?: string
+}) {
+  return internalRequest(`/api/reviews/${encodeURIComponent(payload.id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ rating: payload.rating, comment: payload.comment }),
   })
 }
