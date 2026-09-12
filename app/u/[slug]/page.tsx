@@ -29,7 +29,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         <section className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
           <h2 className="mb-2 font-serif text-lg font-semibold text-foreground">Registre des avis</h2>
           <p className="mb-4 text-sm text-muted-foreground">{profile.reviewCount} avis publiés au sujet de {profile.name}.</p>
-          <ReviewList reviews={profile.reviews} />
+          <ReviewList reviews={profile.reviews} targetId={profile.id} />
         </section>
       </main>
     </div>
