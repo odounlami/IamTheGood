@@ -70,6 +70,26 @@ async function internalRequest<T>(path: string, options: RequestInit = {}) {
   return data as T
 }
 
+const BACKEND_API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "https://imthegoodback.onrender.com"
+).replace(/\/$/, "")
+
+export async function getServerProfile(slug: string) {
+  const response = await fetch(`${BACKEND_API_URL}/users/${encodeURIComponent(slug)}`, {
+    method: "GET",
+    cache: "no-store",
+  })
+
+  const data = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    const message = Array.isArray(data?.message) ? data.message[0] : data?.message
+    throw new Error(message || "Une erreur est survenue.")
+  }
+
+  return data as ApiProfile
+}
+
 export function signup(payload: {
   name: string
   whatsapp: string
