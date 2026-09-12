@@ -13,14 +13,11 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
 
   useEffect(() => {
     let active = true
+
     async function check() {
       const user = getStoredUser()
-      if (!user) {
-        if (active) setReady(true)
-        return
-      }
 
-      if (user.slug === profile.slug) {
+      if (user?.slug === profile.slug) {
         if (active) {
           setIsOwnProfile(true)
           setReady(true)
@@ -32,7 +29,7 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
         const result = await getMyReview(profile.id)
         if (active) setHasReview(!!result.review)
       } catch {
-        // If the session is invalid, the review form will surface the auth state.
+        // Unauthenticated visitors can still see the login state inside ReviewForm.
       } finally {
         if (active) setReady(true)
       }
@@ -57,9 +54,9 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
         </>
       ) : hasReview ? (
         <>
-          <h2 className="mb-1 font-serif text-lg font-semibold text-foreground">Vous avez déjà laissé un avis</h2>
-          <p className="mb-3 text-sm text-muted-foreground">Vous pouvez modifier votre avis depuis le registre des avis.</p>
-          <Button render={<a href="#my-review" />} nativeButton={false} variant="link" className="h-auto px-0">Voir mon avis</Button>
+          <h2 className="mb-1 font-serif text-lg font-semibold text-foreground">Votre avis est déjà publié</h2>
+          <p className="mb-3 text-sm text-muted-foreground">Le formulaire est masqué. Vous pouvez modifier votre seul avis depuis le registre ci-dessous.</p>
+          <Button render={<a href="#my-review" />} nativeButton={false} variant="link" className="h-auto px-0">Modifier mon avis</Button>
         </>
       ) : (
         <>
