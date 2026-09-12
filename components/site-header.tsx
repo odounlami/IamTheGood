@@ -43,6 +43,10 @@ export function SiteHeader({
 
         {!ready ? (
           <div className="h-7 w-24" aria-hidden="true" />
+        ) : variant === "minimal" ? (
+          <Button render={<Link href="/" />} nativeButton={false} variant="outline" size="sm">
+            Accueil
+          </Button>
         ) : user ? (
           <nav className="flex items-center gap-2">
             <Button render={<Link href="/dashboard" />} nativeButton={false} variant="ghost" size="sm">
@@ -52,7 +56,7 @@ export function SiteHeader({
               {loggingOut ? "Déconnexion…" : "Déconnexion"}
             </Button>
           </nav>
-        ) : variant === "marketing" ? (
+        ) : (
           <nav className="flex items-center gap-2">
             <Button render={<Link href="/login" />} nativeButton={false} variant="ghost" size="sm">
               Connexion
@@ -61,10 +65,6 @@ export function SiteHeader({
               Créer mon profil
             </Button>
           </nav>
-        ) : (
-          <Button render={<Link href="/" />} nativeButton={false} variant="outline" size="sm">
-            Accueil
-          </Button>
         )}
       </div>
     </header>
