@@ -25,7 +25,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <SiteHeader variant="minimal" />
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10 md:py-14">
         <ProfileReceipt profile={profile} action={waNumber ? <Button render={<a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" />} nativeButton={false}><MessageCircle data-icon="inline-start" />Contacter sur WhatsApp</Button> : undefined} />
-        <OwnProfileReviewSection profile={{ id: profile.id, name: profile.name, slug: profile.slug }} reviewAuthorIds={profile.reviews.map(review => review.authorId).filter((id): id is string => !!id)} />
+        <OwnProfileReviewSection profile={{ id: profile.id, name: profile.name, slug: profile.slug }} />
         <section className="mt-8 border-2 border-foreground/80 bg-card p-6 md:p-8">
           <h2 className="mb-2 font-serif text-lg font-semibold text-foreground">Registre des avis</h2>
           <p className="mb-4 text-sm text-muted-foreground">{profile.reviewCount} avis publiés au sujet de {profile.name}.</p>
