@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ReviewForm } from "@/components/review-form"
-import { getStoredUser } from "@/lib/api"
+import { getMyReview, getStoredUser } from "@/lib/api"
 
 export function OwnProfileReviewSection({ profile }: { profile: { id: string; name: string; slug: string } }) {
   const [ready, setReady] = useState(false)
@@ -12,41 +12,34 @@ export function OwnProfileReviewSection({ profile }: { profile: { id: string; na
   const [hasReview, setHasReview] = useState(false)
 
   useEffect(() => {
-    let cancelled = false
-
-    async function checkReview() {
+    let active = true
+    async function check() {
       const user = getStoredUser()
       if (!user) {
-        if (!cancelled) {
-          setIsOwnProfile(false)
-          setHasReview(false)
-          setReady(true)
-        }
+        if (active) setReady(true)
         return
       }
 
       if (user.slug === profile.slug) {
-        if (!cancelled) {
+        if (active) {
           setIsOwnProfile(true)
-          setHasReview(false)
           setReady(true)
         }
         return
       }
 
       try {
-        const response = await fetch(`/api/reviews?targetId=${encodeURIComponent(profile.id)}`, { cache: "no-store" })
-        const data = await response.json().catch(() => null)
-        if (!cancelled) setHasReview(response.ok && !!data?.review)
+        const result = await getMyReview(profile.id)
+        if (active) setHasReview(!!result.review)
       } catch {
-        if (!cancelled) setHasReview(false)
+        // If the session is invalid, the review form will surface the auth state.
       } finally {
-        if (!cancelled) setReady(true)
+        if (active) setReady(true)
       }
     }
 
-    checkReview()
-    return () => { cancelled = true }
+    check()
+    return () => { active = false }
   }, [profile.id, profile.slug])
 
   return (
