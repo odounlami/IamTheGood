@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { SiteHeader } from "@/components/site-header"
 import { ProfileReceipt } from "@/components/profile-receipt"
 import { LedgerReview } from "@/components/ledger-review"
-import { changePassword, getProfile, getStoredUser, setAuth, type ApiProfile } from "@/lib/api"
+import { changePassword, clearAuth, getCurrentUser, getProfile, getStoredUser, setAuth, type ApiProfile } from "@/lib/api"
 import { formatRating } from "@/lib/mock-data"
 
 export default function DashboardPage() {
@@ -37,21 +37,32 @@ export default function DashboardPage() {
   const [passwordSuccess, setPasswordSuccess] = useState("")
 
   useEffect(() => {
-    const user = getStoredUser()
-    if (!user) {
-      router.replace("/login")
-      return
-    }
-    setEmail(user.email)
-    getProfile(user.slug)
-      .then((data) => {
+    let cancelled = false
+
+    async function loadDashboard() {
+      try {
+        const { user } = await getCurrentUser()
+        if (cancelled) return
+        setAuth({ user })
+        setEmail(user.email)
+        const data = await getProfile(user.slug)
+        if (cancelled) return
         setProfile(data)
         setName(data.name)
         setBio(data.bio ?? "")
         setWhatsapp(data.whatsapp ?? "")
-      })
-      .catch((err) => setError(err instanceof Error ? err.message : "Impossible de charger votre profil."))
-      .finally(() => setLoading(false))
+      } catch (err) {
+        if (cancelled) return
+        clearAuth()
+        router.replace("/login")
+        setError(err instanceof Error ? err.message : "Session expirée. Veuillez vous reconnecter.")
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void loadDashboard()
+    return () => { cancelled = true }
   }, [router])
 
   async function handleSave() {

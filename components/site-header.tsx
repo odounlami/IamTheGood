@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { clearAuth, getStoredUser, type AuthUser } from "@/lib/api"
+import { clearAuth, getCurrentUser, setAuth, type AuthUser } from "@/lib/api"
 import { cn } from "@/lib/utils"
 
 export function SiteHeader({
@@ -21,8 +21,22 @@ export function SiteHeader({
   const [loggingOut, setLoggingOut] = useState(false)
 
   useEffect(() => {
-    setUser(getStoredUser())
-    setReady(true)
+    let cancelled = false
+    getCurrentUser()
+      .then(({ user }) => {
+        if (cancelled) return
+        setAuth({ user })
+        setUser(user)
+      })
+      .catch(() => {
+        if (cancelled) return
+        clearAuth()
+        setUser(null)
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true)
+      })
+    return () => { cancelled = true }
   }, [])
 
   async function handleLogout() {
