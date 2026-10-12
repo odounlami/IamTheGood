@@ -48,17 +48,22 @@ export function setAuth(response: AuthResponse) {
 }
 
 export function clearAuth() {
-  localStorage.removeItem("iamthegood_user")
-  void fetch("/api/auth/logout", { method: "POST" })
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("iamthegood_user")
+  }
+  void fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined)
 }
 
 async function internalRequest<T>(path: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers)
-  headers.set("Content-Type", "application/json")
+  if (options.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json")
+  }
 
   const response = await fetch(path, {
     ...options,
     headers,
+    credentials: "same-origin",
   })
 
   const data = await response.json().catch(() => null)
@@ -72,7 +77,7 @@ async function internalRequest<T>(path: string, options: RequestInit = {}) {
 }
 
 const BACKEND_API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? "https://imthegoodback.onrender.com"
+  process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "https://imthegoodback.onrender.com"
 ).replace(/\/$/, "")
 
 export async function getServerProfile(slug: string) {
@@ -97,10 +102,14 @@ export async function getMyReview(targetId: string) {
   )
 }
 
+export function getCurrentUser() {
+  return internalRequest<AuthResponse>("/api/auth/me", { cache: "no-store" })
+}
+
 export function signup(payload: {
   name: string
-  whatsapp: string
-  bio: string
+  whatsapp?: string
+  bio?: string
   email: string
   password: string
   confirmPassword: string
@@ -119,7 +128,7 @@ export function login(payload: { email: string; password: string }) {
 }
 
 export function getProfile(slug: string) {
-  return internalRequest<ApiProfile>(`/api/profile/${encodeURIComponent(slug)}`)
+  return internalRequest<ApiProfile>(`/api/profile/${encodeURIComponent(slug)}`, { cache: "no-store" })
 }
 
 export function updateMyProfile(payload: {
