@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server"
 
+export const runtime = "nodejs"
+// Keep login and signup within the same timeout budget while Render wakes up.
+export const maxDuration = 60
+
 const API_URL = (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "https://imthegoodback.onrender.com").replace(/\/$/, "")
 const COOKIE_NAME = "iamthegood_token"
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60
+const UPSTREAM_TIMEOUT_MS = 55_000
 
 export async function POST(request: Request) {
   let body: unknown
@@ -18,6 +23,7 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
       cache: "no-store",
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     })
     const data = await response.json().catch(() => null)
 
@@ -39,7 +45,13 @@ export async function POST(request: Request) {
       maxAge: SESSION_MAX_AGE,
     })
     return result
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError")) {
+      return NextResponse.json(
+        { message: "Le serveur met trop de temps à répondre. Réessaie dans quelques secondes." },
+        { status: 504 },
+      )
+    }
     return NextResponse.json({ message: "Le service d'authentification est indisponible." }, { status: 502 })
   }
 }
